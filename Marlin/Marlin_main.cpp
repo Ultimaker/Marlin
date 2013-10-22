@@ -1145,6 +1145,14 @@ void process_commands()
       case 80: // M80 - ATX Power On
         SET_OUTPUT(PS_ON_PIN); //GND
         WRITE(PS_ON_PIN, PS_ON_AWAKE);
+
+        // If you have a switch on suicide pin, this is useful
+        // if you want to start another print with suicide feature after
+        // a print without suicide...
+        #if defined SUICIDE_PIN && SUICIDE_PIN > -1
+          SET_OUTPUT(SUICIDE_PIN);
+          WRITE(SUICIDE_PIN, HIGH);
+        #endif
         break;
       #endif
       
