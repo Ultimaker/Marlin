@@ -14,7 +14,7 @@
 //                      |01234567890123456789|
 #define VERSION_BASE    "Ultimaker: 13.03"
 #ifndef VERSION_PROFILE
-#define VERSION_PROFILE "Github checkout"
+#define VERSION_PROFILE "Github checkout hugo"
 #endif
 
 #define VERSION_STRING  VERSION_BASE " (" VERSION_PROFILE ")"
@@ -26,8 +26,8 @@
 
 // This determines the communication speed of the printer
 #ifndef BAUDRATE
-#define BAUDRATE 250000
-//#define BAUDRATE 115200
+//#define BAUDRATE 250000
+#define BAUDRATE 115200
 #endif
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
@@ -97,7 +97,7 @@
 #define TEMP_SENSOR_1 0
 #endif
 #define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_BED 0
+#define TEMP_SENSOR_BED 5
 
 // Actual temperature must be close to target for this long before M109 returns success
 #define TEMP_RESIDENCY_TIME 3	// (seconds)
