@@ -1,0 +1,17 @@
+@echo off
+
+SET PATH=%PATH%;C:\arduino-1.0.3\hardware\tools\avr\bin
+SET PATH=%PATH%;C:\arduino-1.0.3\hardware\tools\avr\utils\bin
+
+SET BASE_PARAMS=HARDWARE_MOTHERBOARD=72 ARDUINO_INSTALL_DIR=C:/arduino-1.0.3 ARDUINO_VERSION=103 
+make %BASE_PARAMS% BUILD_DIR=_UltimakerMarlin_UMOP_250000 DEFINES="'VERSION_PROFILE=\"250000_single\"' BAUDRATE=250000 TEMP_SENSOR_1=0 EXTRUDERS=1"
+make %BASE_PARAMS% BUILD_DIR=_UltimakerMarlin_UMOP_115200 DEFINES="'VERSION_PROFILE=\"115200_single\"' BAUDRATE=115200 TEMP_SENSOR_1=0 EXTRUDERS=1"
+make %BASE_PARAMS% BUILD_DIR=_UltimakerMarlin_UMOP_Dual_250000 DEFINES="'VERSION_PROFILE=\"250000_dual\"' BAUDRATE=250000 TEMP_SENSOR_1=20 EXTRUDERS=2"
+make %BASE_PARAMS% BUILD_DIR=_UltimakerMarlin_UMOP_Dual_115200 DEFINES="'VERSION_PROFILE=\"115200_dual\"' BAUDRATE=115200 TEMP_SENSOR_1=20 EXTRUDERS=2"
+
+copy _UltimakerMarlin_UMOP_250000\Marlin.hex MarlinUltimaker-UMOP-250000.hex
+copy _UltimakerMarlin_UMOP_115200\Marlin.hex MarlinUltimaker-UMOP-115200.hex
+copy _UltimakerMarlin_UMOP_Dual_250000\Marlin.hex MarlinUltimaker-UMOP-250000-dual.hex
+copy _UltimakerMarlin_UMOP_Dual_115200\Marlin.hex MarlinUltimaker-UMOP-115200-dual.hex
+
+pause

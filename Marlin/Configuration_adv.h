@@ -86,7 +86,9 @@
 //=============================Mechanical Settings===========================
 //===========================================================================
 
-//#define ENDSTOPS_ONLY_FOR_HOMING // If defined the endstops will only be used for homing
+#ifdef ULTIMAKER_HBK
+#define ENDSTOPS_ONLY_FOR_HOMING // If defined the endstops will only be used for homing
+#endif
 
 
 //// AUTOSET LOCATIONS OF LIMIT SWITCHES
@@ -229,14 +231,22 @@
 #define INVERT_E_STEP_PIN false
 
 //default stepper release if idle
+#ifdef ULTIMAKER_HBK
+#define DEFAULT_STEPPER_DEACTIVE_TIME 60 * 10
+#else
 #define DEFAULT_STEPPER_DEACTIVE_TIME 60
+#endif
 
 #define DEFAULT_MINIMUMFEEDRATE       0.0     // minimum feedrate
 #define DEFAULT_MINTRAVELFEEDRATE     0.0
 
 // Feedrates for manual moves along X, Y, Z, E from panel
 #ifdef ULTIPANEL
+#ifdef ULTIMAKER_HBK
+#define MANUAL_FEEDRATE {80*60, 80*60, 30*60, 60}  // set the speeds for manual moves (mm/min)
+#else
 #define MANUAL_FEEDRATE {50*60, 50*60, 4*60, 60}  // set the speeds for manual moves (mm/min)
+#endif
 #endif
 
 //Comment to disable setting feedrate multiplier via encoder

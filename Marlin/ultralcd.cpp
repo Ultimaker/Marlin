@@ -50,6 +50,9 @@ extern bool powersupply;
 static void lcd_main_menu();
 static void lcd_tune_menu();
 static void lcd_prepare_menu();
+#ifdef ULTIMAKER_HBK
+static void lcd_prepare_move_z();
+#endif
 static void lcd_move_menu();
 static void lcd_control_menu();
 static void lcd_control_temperature_menu();
@@ -384,13 +387,17 @@ static void lcd_tune_menu()
     MENU_ITEM_EDIT(int3, MSG_BED, &target_temperature_bed, 0, BED_MAXTEMP - 15);
 #endif
     MENU_ITEM_EDIT(int3, MSG_FAN_SPEED, &fanSpeed, 0, 255);
+#if !defined(ULTIMAKER_HBK) || (defined(ULTIMAKER_HBK) && EXTRUDERS == 1)
     MENU_ITEM_EDIT(int3, MSG_FLOW, &extrudemultiply, 10, 999);
+#endif
+#if !defined(ULTIMAKER_HBK) || (defined(ULTIMAKER_HBK) && EXTRUDERS > 1)
     MENU_ITEM_EDIT(int3, MSG_FLOW0, &extruder_multiply[0], 10, 999);
 #if TEMP_SENSOR_1 != 0
     MENU_ITEM_EDIT(int3, MSG_FLOW1, &extruder_multiply[1], 10, 999);
 #endif
 #if TEMP_SENSOR_2 != 0
     MENU_ITEM_EDIT(int3, MSG_FLOW2, &extruder_multiply[2], 10, 999);
+#endif
 #endif
 
 #ifdef BABYSTEPPING
@@ -554,6 +561,14 @@ void lcd_cooldown()
     lcd_return_to_status();
 }
 
+#ifdef ULTIMAKER_HBK
+static void lcd_home()
+{
+    enquecommand_P(PSTR("G28"));
+    enquecommand_P(PSTR("M84 X0 Y0"));
+}
+#endif
+
 static void lcd_prepare_menu()
 {
     START_MENU();
@@ -564,7 +579,12 @@ static void lcd_prepare_menu()
     #endif
 #endif
     MENU_ITEM(gcode, MSG_DISABLE_STEPPERS, PSTR("M84"));
+#ifdef ULTIMAKER_HBK
+    MENU_ITEM(function, MSG_AUTO_HOME, lcd_home);
+    MENU_ITEM(submenu, "Move Z", lcd_prepare_move_z);
+#else
     MENU_ITEM(gcode, MSG_AUTO_HOME, PSTR("G28"));
+#endif
     //MENU_ITEM(gcode, MSG_SET_ORIGIN, PSTR("G92 X0 Y0 Z0"));
 #if TEMP_SENSOR_0 != 0
   #if TEMP_SENSOR_1 != 0 || TEMP_SENSOR_2 != 0 || TEMP_SENSOR_BED != 0
@@ -681,6 +701,38 @@ static void lcd_move_z()
         encoderPosition = 0;
     }
 }
+#ifdef ULTIMAKER_HBK
+static void lcd_prepare_move_z()
+{
+    if (encoderPosition != 0)
+    {
+        refresh_cmd_timeout();
+        current_position[Z_AXIS] += float((int)encoderPosition) * 0.05;
+        //if (min_software_endstops && current_position[Z_AXIS] < Z_MIN_POS)
+        //    current_position[Z_AXIS] = Z_MIN_POS;
+        //if (max_software_endstops && current_position[Z_AXIS] > Z_MAX_POS)
+        //    current_position[Z_AXIS] = Z_MAX_POS;
+        encoderPosition = 0;
+        #ifdef DELTA
+        calculate_delta(current_position);
+        plan_buffer_line(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], current_position[E_AXIS], manual_feedrate[Z_AXIS]/60, active_extruder);
+        #else
+        plan_buffer_line(current_position[X_AXIS], current_position[Y_AXIS], current_position[Z_AXIS], current_position[E_AXIS], manual_feedrate[Z_AXIS]/60, active_extruder);
+        #endif
+        lcdDrawUpdate = 1;
+    }
+    if (lcdDrawUpdate)
+    {
+        lcd_implementation_drawedit(PSTR("Z"), ftostr31(current_position[Z_AXIS]));
+    }
+    if (LCD_CLICKED)
+    {
+        lcd_quick_feedback();
+        currentMenu = lcd_prepare_menu;
+        encoderPosition = 0;
+    }
+}
+#endif
 static void lcd_move_e()
 {
     if (encoderPosition != 0)
